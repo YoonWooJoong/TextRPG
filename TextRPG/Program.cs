@@ -186,14 +186,14 @@ namespace TextRPG
                     Console.WriteLine();
                     Console.WriteLine("원하시는 행동을 입력해주세요");
                     Console.Write(">>");
-                    bool isState = int.TryParse(Console.ReadLine(), out secondNum);
+                    bool isInven = int.TryParse(Console.ReadLine(), out secondNum);
 
-                    if (isState && secondNum == 1) // 장비 관리로 넘어갈시 초기화면 비활성화와 장비관리 활성화
+                    if (isInven && secondNum == 1) // 장비 관리로 넘어갈시 초기화면 비활성화와 장비관리 활성화
                     {
                         isInvenPg = true;
                         isStartPg = false;
                     }
-                    else if (!isState || secondNum != 0) // 0이 아닐때 예외처리
+                    else if (!isInven || secondNum != 0) // 0이 아닐때 예외처리
                     {
                         Console.WriteLine("입력이 잘못됐습니다.");
                         Thread.Sleep(500); // 0.5초 지연
@@ -211,14 +211,14 @@ namespace TextRPG
                     Console.WriteLine();
                     Console.WriteLine("원하시는 행동을 입력해주세요");
                     Console.Write(">>");
-                    bool isState = int.TryParse(Console.ReadLine(), out secondNum);
+                    bool isInven = int.TryParse(Console.ReadLine(), out secondNum);
 
-                    if (isState && secondNum == 0) // 0입력시 장비관리 비활성화
+                    if (isInven && secondNum == 0) // 0입력시 장비관리 비활성화
                     {
                         Console.Clear();
                         isInvenPg = false;
                     }
-                    else if (!isState || (secondNum < 0) || (secondNum > inven.Count))
+                    else if (!isInven || (secondNum < 0) || (secondNum > inven.Count))
                     {
                         Console.WriteLine("입력이 잘못됐습니다.");
                         Thread.Sleep(500); // 0.5초 지연
@@ -327,15 +327,15 @@ namespace TextRPG
                     Console.WriteLine();
                     Console.WriteLine("원하시는 행동을 입력해주세요");
                     Console.Write(">>");
-                    bool isState = int.TryParse(Console.ReadLine(), out secondNum);
+                    bool isStore = int.TryParse(Console.ReadLine(), out secondNum);
 
-                    if (isState && secondNum == 1) // 아이템 구매로 넘어갈시 초기화면 비활성화와 장비관리 활성화
+                    if (isStore && secondNum == 1) // 아이템 구매로 넘어갈시 초기화면 비활성화와 장비관리 활성화
                     {
                         Console.Clear();
                         isStorePurchase = true;
                         isStartPg = false;
                     }
-                    else if (!isState || secondNum != 0) // 0이 아닐때 예외처리
+                    else if (!isStore || secondNum != 0) // 0이 아닐때 예외처리
                     {
                         Console.WriteLine("입력이 잘못됐습니다.");
                         Thread.Sleep(500); // 0.5초 지연
@@ -355,14 +355,14 @@ namespace TextRPG
                     Console.WriteLine();
                     Console.WriteLine("원하시는 행동을 입력해주세요");
                     Console.Write(">>");
-                    bool isState = int.TryParse(Console.ReadLine(), out secondNum);
+                    bool isStore = int.TryParse(Console.ReadLine(), out secondNum);
 
-                    if (isState && secondNum == 0) // 0입력시 아이템구매 비활성화
+                    if (isStore && secondNum == 0) // 0입력시 아이템구매 비활성화
                     {
                         Console.Clear();
                         isStorePurchase = false;
                     }
-                    else if (isState == false || (secondNum < 0) || (secondNum > makeItem.Count))
+                    else if (isStore == false || (secondNum < 0) || (secondNum > makeItem.Count))
                     {
                         Console.WriteLine("입력이 잘못됐습니다!");
                         Thread.Sleep(500); // 0.5초 지연
