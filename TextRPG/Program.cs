@@ -398,6 +398,12 @@ namespace TextRPG
 
             
         }
+        // makeItem이라는 아이템들이 모여있는 리스트 가져옴
+        // inven이라는 인벤토리 아이템리스트 불러오고 구매시 makeItem의 아이템을 inven에 Add
+        // Player의 gold값을 변경해야 하기 때문에 ref사용
+        // secondNum은 계속해서 상세 선택할때 값이 바뀐것을 메인에도 적용하기때문에 ref 사용
+        // isStorePurchase는 장비구매 화면을 활성화할건지 안할건지여부인데 메인에서 적용을해야 화면에 적용이되기때문에 ref사용
+        // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
         static void Main(string[] args)
         {
             List<Item> makeItem = new List<Item>(); // 아이템 생성
