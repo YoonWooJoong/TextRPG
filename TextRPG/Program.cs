@@ -16,11 +16,11 @@ namespace TextRPG
         }
         public class Item
         {
-            public string name;
-            public int damage;
-            public int defence;
-            public int gold;
-            public string explanation;
+            public string name; //아이템 이름
+            public int damage; // 공격력
+            public int defence; // 방어력
+            public int gold; // 재화
+            public string explanation; // 아이템 설명
             public int itemType; // 아이템이 공격아이템인지, 방어아이템인지 공격이면 1 방어면 2
             public bool isOwn; // 소유중인지 아닌지
             public bool isEquip; // 장착중인지 아닌지
@@ -440,10 +440,12 @@ namespace TextRPG
                 }
                 if (isTrue && firstNum == 1)
                 {
+                    // 상태
                     StateScene(player, playerName, ref equipAttackstate, ref equipDefencestate, ref secondNum, ref isStartPg);
                 }
                 else if (isTrue && firstNum == 2)
                 {
+                    //인벤토리
                     InvenScene(inven, ref secondNum, ref equipAttackstate, ref equipDefencestate, ref isInvenPg, ref isStartPg);
                 }
                 else if (isTrue && firstNum == 3)
