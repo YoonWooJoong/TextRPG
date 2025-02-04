@@ -70,6 +70,7 @@ namespace TextRPG
             Console.WriteLine("1. 상태 보기");
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
+            Console.WriteLine("4. 휴식하기");
             Console.WriteLine();
             Console.WriteLine("원하시는 행동을 입력해주세요");
             Console.Write(">>");
@@ -115,12 +116,10 @@ namespace TextRPG
             {
                 Console.WriteLine("입력이 잘못됐습니다.");
                 Thread.Sleep(500); // 0.5초 지연
-                Console.Clear();
                 isStartPg = false;
             }
             else
             {
-                Console.Clear();
                 isStartPg = true;
             }
         } // 상태창
@@ -404,6 +403,50 @@ namespace TextRPG
         // secondNum은 계속해서 상세 선택할때 값이 바뀐것을 메인에도 적용하기때문에 ref 사용
         // isStorePurchase는 장비구매 화면을 활성화할건지 안할건지여부인데 메인에서 적용을해야 화면에 적용이되기때문에 ref사용
         // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
+
+        static void RestScene(ref Player player, ref int secondNum, ref bool isStartPg)
+        {
+            Console.Clear();
+            Console.WriteLine("[휴식하기]");
+            Console.WriteLine("500 G 를 내면 체력을 회복할 수 있습니다. (보유 골드 : {0} G)",player.gold);
+            Console.WriteLine();
+            Console.WriteLine("1. 휴식하기");
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine();
+            Console.WriteLine("원하시는 행동을 입력해 주세요");
+            Console.Write(">>");
+            bool isRest = int.TryParse(Console.ReadLine(), out secondNum);
+
+            if (isRest && secondNum == 1)
+            {
+                if (player.gold >= 500)
+                {
+                    Console.WriteLine("휴식을 완료했습니다.");
+                    player.gold -= 500;
+                    player.health = 100;
+                    isStartPg = false;
+                    Thread.Sleep(500);
+                }
+                else
+                {
+                    Console.WriteLine("Gold가 부족합니다.");
+                    isStartPg = false;
+                    Thread.Sleep(500);
+                }
+            }
+            else if (isRest && secondNum == 0)
+            {
+                isStartPg = true;
+            }
+            else
+            {
+                Console.WriteLine("입력을 다시해주세요.");
+                isStartPg = false;
+                Thread.Sleep(500);
+            }
+
+        }
+
         static void Main(string[] args)
         {
             List<Item> makeItem = new List<Item>(); // 아이템 생성
@@ -452,6 +495,10 @@ namespace TextRPG
                 {
                     // 상점
                     StoreScene(makeItem, inven, ref player, ref secondNum, ref isStorePurchase, ref isStartPg);
+                }
+                else if (isTrue && firstNum == 4)
+                {
+                    RestScene(ref player, ref secondNum, ref isStartPg);
                 }
                 else
                 {
