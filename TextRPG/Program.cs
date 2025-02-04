@@ -9,7 +9,7 @@ namespace TextRPG
         {
             public int level;
             public string job;
-            public int attack;
+            public float attack;
             public int defence;
             public int health;
             public int gold;
@@ -17,7 +17,7 @@ namespace TextRPG
         public class Item
         {
             public string name; //아이템 이름
-            public int damage; // 공격력
+            public float damage; // 공격력
             public int defence; // 방어력
             public int gold; // 재화
             public string explanation; // 아이템 설명
@@ -25,7 +25,7 @@ namespace TextRPG
             public bool isOwn; // 소유중인지 아닌지
             public bool isEquip; // 장착중인지 아닌지
             public int itemCord; // 아이템 코드
-            public Item(string _name, int _damage, int _defence, int _gold, string _explanation, int _itemType, bool _isOwn, bool _isEquip, int _itemCord)
+            public Item(string _name, float _damage, int _defence, int _gold, string _explanation, int _itemType, bool _isOwn, bool _isEquip, int _itemCord)
             {
                 name = _name;
                 damage = _damage;
@@ -73,6 +73,7 @@ namespace TextRPG
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
             Console.WriteLine("4. 휴식하기");
+            Console.WriteLine("5. 던전입장");
             Console.WriteLine();
             Console.WriteLine("원하시는 행동을 입력해주세요");
             Console.Write(">>");
@@ -81,7 +82,7 @@ namespace TextRPG
             return isTrue;
         } // 게임 시작 화면 // isTrue는 return으로 받고 firstNum은 값이 계속해서 바꿔야하기때문에 out 사용
 
-        static void StateScene(Player player, string playerName, ref int equipAttackstate, ref int equipDefenceState, ref int secondNum, ref bool isStartPg)
+        static void StateScene(Player player, string playerName, ref float equipAttackstate, ref int equipDefenceState, ref int secondNum, ref bool isStartPg)
         {
             //상태보기
             Console.Clear();
@@ -129,7 +130,7 @@ namespace TextRPG
         // equipAttackstate와 equipDefenceState는 장착하고 장착 해제시 계속해서 바뀐값이 메인에서도 적용해야 하기에 ref사용
         // secondNum은 계속해서 상세 선택할때 값이 바뀐것을 메인에도 적용하기때문에 ref 사용
         // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
-        static void InvenScene(List<Item> inven, ref int secondNum, ref int equipAttackstate, ref int equipDefenceState, ref bool isInvenPg, ref bool isStartPg, ref bool isWeaponCheck, ref bool isArmorCheck)
+        static void InvenScene(List<Item> inven, ref int secondNum, ref float equipAttackstate, ref int equipDefenceState, ref bool isInvenPg, ref bool isStartPg, ref bool isWeaponCheck, ref bool isArmorCheck)
         {
             {
                 void InvenList(ref int secondNum, ref bool isInvenPg, ref bool isStartPg)
@@ -159,7 +160,7 @@ namespace TextRPG
                     }
                 }
 
-                void InvenEquip(ref int secondNum, ref bool isInvenPg, ref int equipAttackstate, ref int equipDefenceState, ref bool isWeaponCheck, ref bool isArmorCheck)
+                void InvenEquip(ref int secondNum, ref bool isInvenPg, ref float equipAttackstate, ref int equipDefenceState, ref bool isWeaponCheck, ref bool isArmorCheck)
                 {
                     Console.WriteLine();
                     Console.WriteLine("0. 나가기");
@@ -297,7 +298,7 @@ namespace TextRPG
         // isInvenPg는 장비관리 화면을 활성화할건지 안할건지여부인데 메인에서 적용을해야 화면에 적용이되기때문에 ref사용
         // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
 
-        static void StoreScene(List<Item> makeItem, List<Item> inven, ref Player player, ref int secondNum, ref int equipAttackstate, ref int equipDefenceState, ref bool isStorePurchase, ref bool isStoreSell ,ref bool isStartPg)
+        static void StoreScene(List<Item> makeItem, List<Item> inven, ref Player player, ref int secondNum, ref float equipAttackstate, ref int equipDefenceState, ref bool isStorePurchase, ref bool isStoreSell ,ref bool isStartPg)
         {
             void StoreList(ref int secondNum, ref bool isStorePurchase, ref bool isStoreSell, ref bool isStartPg)
             {
@@ -378,7 +379,7 @@ namespace TextRPG
                 }
             }
             // 상점 구매 기능
-            void StoreSell(ref int secondNum, ref bool isStoreSell, ref Player player, ref int equipAttackstate, ref int equipDefenceState)
+            void StoreSell(ref int secondNum, ref bool isStoreSell, ref Player player, ref float equipAttackstate, ref int equipDefenceState)
             {
                 Console.WriteLine();
                 Console.WriteLine("0. 나가기");
@@ -565,6 +566,126 @@ namespace TextRPG
 
         }
 
+        static void DungeonScene(ref Player player, ref int secondNum, Random random, ref bool isStartPg )
+        {
+            int[] dungeonGold = new int[3] { 1000, 1700, 2500 };
+            int[] dungeonDefence = new int[3] { 5, 11, 17};
+            string[] dungeonName = new string[3] { "쉬운", "일반", "어려운" };
+            int oldHealth = player.health;
+            int oldGold = player.gold;
+            bool isDungeonSucsses = false;
+
+            void Dungenlevel(ref Player player, int[] dungeonDefence, int[] dungeonGold, int dungeondiff, ref bool isStartPg, ref bool isDungeonSucsses, ref int oldHealth, ref int oldGold,ref int secondNum)
+            {
+                if (player.defence >= dungeonDefence[dungeondiff-1])
+                {
+                    oldHealth = player.health;
+                    oldGold = player.gold;
+                    player.health -= random.Next(20, 36) + (5 - player.defence);
+                    player.gold += dungeonGold[dungeondiff-1] + (((int)player.attack * dungeonGold[dungeondiff - 1]) / 100);
+                    isDungeonSucsses = true;
+                }
+                else if (player.defence < dungeonDefence[dungeondiff - 1])
+                {
+                    int persent = random.Next(1, 11);
+                    if (persent >= 7)
+                    {
+                        oldHealth = player.health;
+                        player.health -= 50;
+                        isDungeonSucsses = false;
+                    }
+                    else
+                    {
+                        oldHealth = player.health;
+                        oldGold = player.gold;
+                        player.health -= random.Next(20, 36) + (dungeonDefence[dungeondiff - 1] - player.defence);
+                        player.gold += dungeonGold[dungeondiff - 1] + (((int)player.attack * dungeonGold[dungeondiff - 1]) / 100);
+                        isDungeonSucsses = true;
+                    }
+                }
+                isStartPg = false;
+            }
+            Console.Clear();
+            Console.WriteLine("[던전 입장]");
+            Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
+            Console.WriteLine();
+            Console.WriteLine("1. 쉬운 던전 \t| 방어력 5 이상 권장");
+            Console.WriteLine("2. 일반 던전 \t| 방어력 11 이상 권장");
+            Console.WriteLine("3. 어려운 던전 \t| 방어력 5 이상 권장");
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine();
+            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.Write(">>");
+            bool isDungeon = int.TryParse(Console.ReadLine(), out secondNum);
+
+            if (isDungeon && secondNum == 1) // 쉬운던전
+            {
+                Dungenlevel(ref player, dungeonDefence, dungeonGold, 1, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
+            }
+            else if (isDungeon && secondNum == 2)// 일반던전
+            {
+                Dungenlevel(ref player, dungeonDefence, dungeonGold, 2, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
+            }
+            else if (isDungeon && secondNum == 3)// 어려운 던전
+            {
+                Dungenlevel(ref player, dungeonDefence, dungeonGold, 3, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
+            }
+            else if (isDungeon && secondNum == 0)
+            {
+                {
+                    isStartPg = true;
+                }
+            }
+            else
+            {
+                Console.WriteLine("입력이 잘못됐습니다.");
+                Thread.Sleep(500); // 0.5초 지연
+                isStartPg = false;
+            }
+            if (isDungeonSucsses == true)
+            {
+                Console.Clear();
+                Console.WriteLine("[던전 클리어]");
+                Console.WriteLine("축하합니다!!");
+                Console.WriteLine("{0} 던전을 클리어 하였습니다.", dungeonName[secondNum-1]);
+                Console.WriteLine();
+                Console.WriteLine("[탐험 결과]");
+                Console.WriteLine("체력 {0} -> {1}", oldHealth, player.health);
+                Console.WriteLine("Gold {0} G -> {1} G", oldGold, player.gold);
+                Console.WriteLine();
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요.");
+                Console.Write(">>");
+                isDungeon = int.TryParse(Console.ReadLine(), out secondNum);
+                if (isDungeon && secondNum == 0)
+                {
+                    isStartPg = true;
+                }
+            }
+            else if(isDungeonSucsses == false)
+            {
+                Console.Clear();
+                Console.WriteLine("[던전 실패]");
+                Console.WriteLine("실패하였습니다...");
+                Console.WriteLine("{0} 던전을 실패 하였습니다.", dungeonName[secondNum - 1]);
+                Console.WriteLine();
+                Console.WriteLine("[탐험 결과]");
+                Console.WriteLine("체력 {0} -> {1}", oldHealth, player.health);
+                Console.WriteLine("Gold {0} G -> {1} G", oldGold, player.gold);
+                Console.WriteLine();
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요.");
+                Console.Write(">>");
+                isDungeon = int.TryParse(Console.ReadLine(), out secondNum);
+                if (isDungeon && secondNum == 0)
+                {
+                    isStartPg = true;
+                }
+            }    
+        }
+
         static void ItemMake(List<Item> makeItem)
         {
             makeItem.Add(new Item("낡은 검", 2, 0, 600, "쉽게 볼 수 있는 낡은 검 입니다.", 1, false, false,1));
@@ -582,21 +703,35 @@ namespace TextRPG
             makeItem.Add(new Item("아킬레우스의 갑옷", 0, 50, 9900, "헤파이토스가 만든 아킬레우스의 갑옷입니다.", 2, false, false,12));
         }
 
+        static void LevelUp(ref Player player, ref int count)
+        {
+            if (player.level == count)
+            {
+                player.level += 1;
+                count = 0;
+                player.attack += 0.5f;
+                player.defence += 1;
+            }
+        }
+
+        
+
         static void Main(string[] args)
         {
             List<Item> makeItem = new List<Item>(); // 아이템 생성
-            ItemMake(makeItem);
-
             List<Item> inven = new List<Item>(); // 인벤토리 생성       
+            ItemMake(makeItem);
+            Random random = new Random();
 
             string playerName = CreateName(); // 이름 생성
+
             SettingPlayerState(out Player player); // 플레이어 정보 설정
 
 
             int firstNum = 0; // 초기에 1,2,3 화면전환을 위한 변수
             int secondNum = 1; // 화면 전환 후 선택을 위한 변수
 
-            int equipAttackstate = 0; // 장착 공격력 변수
+            float equipAttackstate = 0; // 장착 공격력 변수
             int equipDefenceState = 0; // 장착 방어력 변수
 
             bool isTrue = false;
@@ -604,8 +739,9 @@ namespace TextRPG
             bool isInvenPg = false; // 인벤토리 관리 활성화 여부
             bool isStorePurchase = false; // 상점구매 활성화 여부
             bool isStoreSell = false; // 상점 판매 활성화 여부
-            bool isWeaponCheck = false;
-            bool isArmorCheck = false;
+
+            bool isWeaponCheck = false; // 무기 중복체크여부
+            bool isArmorCheck = false; // 방어구 중복체크 여부
 
 
             while (true)
@@ -632,6 +768,10 @@ namespace TextRPG
                 else if (isTrue && firstNum == 4)
                 {
                     RestScene(ref player, ref secondNum, ref isStartPg);
+                }
+                else if (isTrue && firstNum == 5)
+                {
+                    DungeonScene(ref player, ref secondNum, random, ref isStartPg);
                 }
                 else
                 {
