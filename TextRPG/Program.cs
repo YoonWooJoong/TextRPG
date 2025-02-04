@@ -515,7 +515,7 @@ namespace TextRPG
             }
 
 
-        }
+        } // 상점
         // makeItem이라는 아이템들이 모여있는 리스트 가져옴
         // inven이라는 인벤토리 아이템리스트 불러오고 구매시 makeItem의 아이템을 inven에 Add
         // Player의 gold값을 변경해야 하기 때문에 ref사용
@@ -564,7 +564,10 @@ namespace TextRPG
                 Thread.Sleep(500);
             }
 
-        }
+        } // 휴식
+        // 휴식시 player 돈을 건들여야 하기 때문에 ref Player 사용
+        // secondNum은 계속해서 상세 선택할때 값이 바뀐것을 메인에도 적용하기때문에 ref 사용
+        // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
 
         static void DungeonScene(ref Player player, ref int secondNum, Random random, ref bool isStartPg, ref int DungeonCount)
         {
@@ -606,6 +609,7 @@ namespace TextRPG
                 }
                 isStartPg = false;
             }
+            // 던전 난이도 별 동작
 
             void DungeonSucsses(ref int secondNum, Player player, bool isDungeon, ref bool isStartPg)
             {
@@ -628,6 +632,7 @@ namespace TextRPG
                     isStartPg = true;
                 }
             }
+            // 던전 클리어 시
 
             void DungeonFail(ref int secondNum, Player player, bool isDungeon, ref bool isStartPg)
             {
@@ -651,7 +656,8 @@ namespace TextRPG
                 }
 
             }
-
+            // 던전 실패 시
+            
             void LevelUp(ref Player player, ref int count)
             {
                 player.level += 1;
@@ -659,6 +665,7 @@ namespace TextRPG
                 player.attack += 0.5f;
                 player.defence += 1;
             }
+            // 레벨업
 
             Console.Clear();
             Console.WriteLine("[던전 입장]");
@@ -697,7 +704,7 @@ namespace TextRPG
                 Thread.Sleep(500); // 0.5초 지연
                 isStartPg = false;
             }
-            if (isDungeon == true && isDungeonSucsses == true && secondNum <=3 && secondNum >=1)
+            if (isDungeon == true && isDungeonSucsses == true && secondNum <=3 && secondNum >=1) // 입력값이 정수 이면서 던전을 클리어했고, 값이 1~3 일 경우
             {
                 DungeonSucsses(ref secondNum, player, isDungeon, ref isStartPg);
                 DungeonCount += 1;
@@ -707,11 +714,16 @@ namespace TextRPG
                 }
                 
             }
-            else if(isDungeon==true && isDungeonSucsses == false && secondNum <= 3 && secondNum >= 1)
+            else if(isDungeon==true && isDungeonSucsses == false && secondNum <= 3 && secondNum >= 1) // 입력값이 정수 이면서 던전을 실패했고, 값이 1~3일 경우
             {
                 DungeonFail(ref secondNum, player, isDungeon, ref isStartPg);
             }    
-        }
+        } // 던전
+        // 던전에서 player의 돈과 체력을 건들여야 하기 때문에 ref Player사용
+        // secondNum은 계속해서 상세 선택할때 값이 바뀐것을 메인에도 적용하기때문에 ref 사용
+        // 랜덤값을 체력 닳을때 사용
+        // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
+        // 레벨업을 위한 DungeonCount 사용
 
         static void ItemMake(List<Item> makeItem)
         {
@@ -729,7 +741,7 @@ namespace TextRPG
             makeItem.Add(new Item("네메아의 사자 가죽", 0, 50, 9900, "헤라클래스가 네메아의 사자의 목을 졸라 죽여서 얻은 가죽입니다.", 2, false, false,11));
             makeItem.Add(new Item("아킬레우스의 갑옷", 0, 50, 9900, "헤파이토스가 만든 아킬레우스의 갑옷입니다.", 2, false, false,12));
         }
-
+        // 아이템 리스트
         
 
         
@@ -745,7 +757,7 @@ namespace TextRPG
 
             SettingPlayerState(out Player player); // 플레이어 정보 설정
 
-            int DungeonCount = 0;
+            int DungeonCount = 0; // 던전 클리어 횟수 레벨업 시 0으로 초기화
             int firstNum = 0; // 초기에 1,2,3 화면전환을 위한 변수
             int secondNum = 1; // 화면 전환 후 선택을 위한 변수
 
@@ -785,10 +797,12 @@ namespace TextRPG
                 }
                 else if (isTrue && firstNum == 4)
                 {
+                    // 휴식
                     RestScene(ref player, ref secondNum, ref isStartPg);
                 }
                 else if (isTrue && firstNum == 5)
                 {
+                    // 던전
                     DungeonScene(ref player, ref secondNum, random, ref isStartPg, ref DungeonCount);
                 }
                 else
