@@ -183,7 +183,7 @@ namespace TextRPG
                     {
                         if (i + 1 == secondNum) // i는 0부터 시작해서 +1 해줌으로써 입력값과 같게 해줌
                         {
-                            if (isWeaponCheck)
+                            if (isWeaponCheck) // 무기가 현재 장착중인지 여부
                             {
                                 if ((inven[i].itemType == 1) && (inven[i].isEquip == true)) // 무기타입이고 장착중이면 무기 데미지를 뺌
                                 {
@@ -197,7 +197,7 @@ namespace TextRPG
                                     Thread.Sleep(500); // 0.5초 지연
                                 }
                             }
-                            else
+                            else // 무기가 장착중이 아닐때
                             {
                                 if ((inven[i].itemType == 1) && (inven[i].isEquip == false)) // 무기타입이고 장착중이면 무기 데미지를 더함
                                 {
@@ -207,9 +207,9 @@ namespace TextRPG
                                 }
                             }
 
-                            if (isArmorCheck)
+                            if (isArmorCheck) // 방어구가 현재 장착중인지 여부
                             {
-                                if (inven[i].itemType == 2 && (inven[i].isEquip == true)) // 방어타입이고 장착중이면 방어력을 더함
+                                if (inven[i].itemType == 2 && (inven[i].isEquip == true)) // 방어타입이고 장착해제면 방어력을 뺌함
                                 {
                                     equipDefenceState -= inven[i].defence;
                                     inven[i].isEquip = !inven[i].isEquip; // 장착 장착해제
@@ -221,9 +221,9 @@ namespace TextRPG
                                     Thread.Sleep(500); // 0.5초 지연
                                 }
                             }
-                            else
+                            else // 방어구가 장착중이 아닐때
                             {
-                                if (inven[i].itemType == 2 && (inven[i].isEquip == false)) // 방어타입이고 장착해제면 방어력을 뺌
+                                if (inven[i].itemType == 2 && (inven[i].isEquip == false)) // 방어타입이고 장착이면 방어력을 더함
                                 {
                                     equipDefenceState += inven[i].defence;
                                     inven[i].isEquip = !inven[i].isEquip; // 장착 장착해제
@@ -706,9 +706,9 @@ namespace TextRPG
             }
             if (isDungeon == true && isDungeonSucsses == true && secondNum <=3 && secondNum >=1) // 입력값이 정수 이면서 던전을 클리어했고, 값이 1~3 일 경우
             {
-                DungeonSucsses(ref secondNum, player, isDungeon, ref isStartPg);
-                DungeonCount += 1;
-                if (DungeonCount == player.level)
+                DungeonSucsses(ref secondNum, player, isDungeon, ref isStartPg); // 던전 성공
+                DungeonCount += 1; // 클리어시 던전 카운트 올라감
+                if (DungeonCount == player.level) // 플레이어 레벨과 던전카운트가 같을 경우 레벨업메서드 실행
                 {
                     LevelUp(ref player, ref DungeonCount);
                 }
@@ -716,7 +716,7 @@ namespace TextRPG
             }
             else if(isDungeon==true && isDungeonSucsses == false && secondNum <= 3 && secondNum >= 1) // 입력값이 정수 이면서 던전을 실패했고, 값이 1~3일 경우
             {
-                DungeonFail(ref secondNum, player, isDungeon, ref isStartPg);
+                DungeonFail(ref secondNum, player, isDungeon, ref isStartPg); // 던전 실패
             }    
         } // 던전
         // 던전에서 player의 돈과 체력을 건들여야 하기 때문에 ref Player사용
