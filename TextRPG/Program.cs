@@ -566,16 +566,17 @@ namespace TextRPG
 
         }
 
-        static void DungeonScene(ref Player player, ref int secondNum, Random random, ref bool isStartPg )
+        static void DungeonScene(ref Player player, ref int secondNum, Random random, ref bool isStartPg, ref int DungeonCount)
         {
             int[] dungeonGold = new int[3] { 1000, 1700, 2500 };
             int[] dungeonDefence = new int[3] { 5, 11, 17};
             string[] dungeonName = new string[3] { "쉬운", "일반", "어려운" };
+            
             int oldHealth = player.health;
             int oldGold = player.gold;
             bool isDungeonSucsses = false;
 
-            void Dungenlevel(ref Player player, int[] dungeonDefence, int[] dungeonGold, int dungeondiff, ref bool isStartPg, ref bool isDungeonSucsses, ref int oldHealth, ref int oldGold,ref int secondNum)
+            void Dungeonlevel(ref Player player, int[] dungeonDefence, int[] dungeonGold, int dungeondiff, ref bool isStartPg, ref bool isDungeonSucsses, ref int oldHealth, ref int oldGold,ref int secondNum)
             {
                 if (player.defence >= dungeonDefence[dungeondiff-1])
                 {
@@ -605,49 +606,13 @@ namespace TextRPG
                 }
                 isStartPg = false;
             }
-            Console.Clear();
-            Console.WriteLine("[던전 입장]");
-            Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
-            Console.WriteLine();
-            Console.WriteLine("1. 쉬운 던전 \t| 방어력 5 이상 권장");
-            Console.WriteLine("2. 일반 던전 \t| 방어력 11 이상 권장");
-            Console.WriteLine("3. 어려운 던전 \t| 방어력 5 이상 권장");
-            Console.WriteLine("0. 나가기");
-            Console.WriteLine();
-            Console.WriteLine("원하시는 행동을 입력해주세요.");
-            Console.Write(">>");
-            bool isDungeon = int.TryParse(Console.ReadLine(), out secondNum);
 
-            if (isDungeon && secondNum == 1) // 쉬운던전
-            {
-                Dungenlevel(ref player, dungeonDefence, dungeonGold, 1, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
-            }
-            else if (isDungeon && secondNum == 2)// 일반던전
-            {
-                Dungenlevel(ref player, dungeonDefence, dungeonGold, 2, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
-            }
-            else if (isDungeon && secondNum == 3)// 어려운 던전
-            {
-                Dungenlevel(ref player, dungeonDefence, dungeonGold, 3, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
-            }
-            else if (isDungeon && secondNum == 0)
-            {
-                {
-                    isStartPg = true;
-                }
-            }
-            else
-            {
-                Console.WriteLine("입력이 잘못됐습니다.");
-                Thread.Sleep(500); // 0.5초 지연
-                isStartPg = false;
-            }
-            if (isDungeonSucsses == true)
+            void DungeonSucsses(ref int secondNum, Player player, bool isDungeon, ref bool isStartPg)
             {
                 Console.Clear();
                 Console.WriteLine("[던전 클리어]");
                 Console.WriteLine("축하합니다!!");
-                Console.WriteLine("{0} 던전을 클리어 하였습니다.", dungeonName[secondNum-1]);
+                Console.WriteLine("{0} 던전을 클리어 하였습니다.", dungeonName[secondNum - 1]);
                 Console.WriteLine();
                 Console.WriteLine("[탐험 결과]");
                 Console.WriteLine("체력 {0} -> {1}", oldHealth, player.health);
@@ -663,7 +628,8 @@ namespace TextRPG
                     isStartPg = true;
                 }
             }
-            else if(isDungeonSucsses == false)
+
+            void DungeonFail(ref int secondNum, Player player, bool isDungeon, ref bool isStartPg)
             {
                 Console.Clear();
                 Console.WriteLine("[던전 실패]");
@@ -683,6 +649,67 @@ namespace TextRPG
                 {
                     isStartPg = true;
                 }
+
+            }
+
+            void LevelUp(ref Player player, ref int count)
+            {
+                player.level += 1;
+                count = 0;
+                player.attack += 0.5f;
+                player.defence += 1;
+            }
+
+            Console.Clear();
+            Console.WriteLine("[던전 입장]");
+            Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
+            Console.WriteLine();
+            Console.WriteLine("1. 쉬운 던전 \t| 방어력 5 이상 권장");
+            Console.WriteLine("2. 일반 던전 \t| 방어력 11 이상 권장");
+            Console.WriteLine("3. 어려운 던전 \t| 방어력 17 이상 권장");
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine();
+            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.Write(">>");
+            bool isDungeon = int.TryParse(Console.ReadLine(), out secondNum);
+
+            if (isDungeon && secondNum == 1) // 쉬운던전
+            {
+                Dungeonlevel(ref player, dungeonDefence, dungeonGold, 1, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
+            }
+            else if (isDungeon && secondNum == 2)// 일반던전
+            {
+                Dungeonlevel(ref player, dungeonDefence, dungeonGold, 2, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
+            }
+            else if (isDungeon && secondNum == 3)// 어려운 던전
+            {
+                Dungeonlevel(ref player, dungeonDefence, dungeonGold, 3, ref isStartPg, ref isDungeonSucsses, ref oldHealth, ref oldGold, ref secondNum);
+            }
+            else if (isDungeon && secondNum == 0)
+            {
+                {
+                    isStartPg = true;
+                }
+            }
+            else
+            {
+                Console.WriteLine("입력이 잘못됐습니다.");
+                Thread.Sleep(500); // 0.5초 지연
+                isStartPg = false;
+            }
+            if (isDungeon == true && isDungeonSucsses == true && secondNum <=3 && secondNum >=1)
+            {
+                DungeonSucsses(ref secondNum, player, isDungeon, ref isStartPg);
+                DungeonCount += 1;
+                if (DungeonCount == player.level)
+                {
+                    LevelUp(ref player, ref DungeonCount);
+                }
+                
+            }
+            else if(isDungeon==true && isDungeonSucsses == false && secondNum <= 3 && secondNum >= 1)
+            {
+                DungeonFail(ref secondNum, player, isDungeon, ref isStartPg);
             }    
         }
 
@@ -703,16 +730,7 @@ namespace TextRPG
             makeItem.Add(new Item("아킬레우스의 갑옷", 0, 50, 9900, "헤파이토스가 만든 아킬레우스의 갑옷입니다.", 2, false, false,12));
         }
 
-        static void LevelUp(ref Player player, ref int count)
-        {
-            if (player.level == count)
-            {
-                player.level += 1;
-                count = 0;
-                player.attack += 0.5f;
-                player.defence += 1;
-            }
-        }
+        
 
         
 
@@ -727,7 +745,7 @@ namespace TextRPG
 
             SettingPlayerState(out Player player); // 플레이어 정보 설정
 
-
+            int DungeonCount = 0;
             int firstNum = 0; // 초기에 1,2,3 화면전환을 위한 변수
             int secondNum = 1; // 화면 전환 후 선택을 위한 변수
 
@@ -771,7 +789,7 @@ namespace TextRPG
                 }
                 else if (isTrue && firstNum == 5)
                 {
-                    DungeonScene(ref player, ref secondNum, random, ref isStartPg);
+                    DungeonScene(ref player, ref secondNum, random, ref isStartPg, ref DungeonCount);
                 }
                 else
                 {
