@@ -24,7 +24,8 @@ namespace TextRPG
             public int itemType; // 아이템이 공격아이템인지, 방어아이템인지 공격이면 1 방어면 2
             public bool isOwn; // 소유중인지 아닌지
             public bool isEquip; // 장착중인지 아닌지
-            public Item(string _name, int _damage, int _defence, int _gold, string _explanation, int _itemType, bool _isOwn, bool _isEquip)
+            public int itemCord; // 아이템 코드
+            public Item(string _name, int _damage, int _defence, int _gold, string _explanation, int _itemType, bool _isOwn, bool _isEquip, int _itemCord)
             {
                 name = _name;
                 damage = _damage;
@@ -34,6 +35,7 @@ namespace TextRPG
                 itemType = _itemType;
                 isOwn = _isOwn;
                 isEquip = _isEquip;
+                itemCord = _itemCord;
             }
         }
 
@@ -57,7 +59,7 @@ namespace TextRPG
             player.attack = 10;
             player.defence = 5;
             player.health = 100;
-            player.gold = 1500;
+            player.gold = 5000;
         } // 플레이어 능력치 설정하고 유지하기 위해 out을 사용
 
         static bool FirstScene(bool isTrue, out int firstNum)
@@ -127,7 +129,7 @@ namespace TextRPG
         // equipAttackstate와 equipDefenceState는 장착하고 장착 해제시 계속해서 바뀐값이 메인에서도 적용해야 하기에 ref사용
         // secondNum은 계속해서 상세 선택할때 값이 바뀐것을 메인에도 적용하기때문에 ref 사용
         // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
-        static void InvenScene(List<Item> inven, ref int secondNum, ref int equipAttackstate, ref int equipDefenceState, ref bool isInvenPg, ref bool isStartPg)
+        static void InvenScene(List<Item> inven, ref int secondNum, ref int equipAttackstate, ref int equipDefenceState, ref bool isInvenPg, ref bool isStartPg, ref bool isWeaponCheck, ref bool isArmorCheck)
         {
             {
                 void InvenList(ref int secondNum, ref bool isInvenPg, ref bool isStartPg)
@@ -157,7 +159,7 @@ namespace TextRPG
                     }
                 }
 
-                void InvenEquip(ref int secondNum, ref bool isInvenPg, ref int equipAttackstate, ref int equipDefenceState)
+                void InvenEquip(ref int secondNum, ref bool isInvenPg, ref int equipAttackstate, ref int equipDefenceState, ref bool isWeaponCheck, ref bool isArmorCheck)
                 {
                     Console.WriteLine();
                     Console.WriteLine("0. 나가기");
@@ -180,22 +182,52 @@ namespace TextRPG
                     {
                         if (i + 1 == secondNum) // i는 0부터 시작해서 +1 해줌으로써 입력값과 같게 해줌
                         {
-                            inven[i].isEquip = !inven[i].isEquip; // 장착 장착해제
-                            if ((inven[i].itemType == 1) && (inven[i].isEquip == true)) // 무기타입이고 장착중이면 무기 데미지를 더함
+                            if (isWeaponCheck)
                             {
-                                equipAttackstate += inven[i].damage;
+                                if ((inven[i].itemType == 1) && (inven[i].isEquip == true)) // 무기타입이고 장착중이면 무기 데미지를 뺌
+                                {
+                                    equipAttackstate -= inven[i].damage;
+                                    inven[i].isEquip = !inven[i].isEquip; // 장착 장착해제
+                                    isWeaponCheck = false;
+                                }
+                                else if (inven[i].itemType == 1 && (inven[i].isEquip == false)) // 무기타입이고 장착해제면 
+                                {
+                                    Console.WriteLine("장착중인 무기가 있습니다. 장착해제 후 장착해주세요.");
+                                    Thread.Sleep(500); // 0.5초 지연
+                                }
                             }
-                            else if (inven[i].itemType == 1 && (inven[i].isEquip == false)) // 무기타입이고 장착해제면 무기 데미지를 뺌
+                            else
                             {
-                                equipAttackstate -= inven[i].damage;
+                                if ((inven[i].itemType == 1) && (inven[i].isEquip == false)) // 무기타입이고 장착중이면 무기 데미지를 더함
+                                {
+                                    equipAttackstate += inven[i].damage;
+                                    inven[i].isEquip = !inven[i].isEquip; // 장착 장착해제
+                                    isWeaponCheck = true;
+                                }
                             }
-                            else if (inven[i].itemType == 2 && (inven[i].isEquip == true)) // 방어타입이고 장착중이면 방어력을 더함
+
+                            if (isArmorCheck)
                             {
-                                equipDefenceState += inven[i].defence;
+                                if (inven[i].itemType == 2 && (inven[i].isEquip == true)) // 방어타입이고 장착중이면 방어력을 더함
+                                {
+                                    equipDefenceState -= inven[i].defence;
+                                    inven[i].isEquip = !inven[i].isEquip; // 장착 장착해제
+                                    isArmorCheck = false;
+                                }
+                                else if (inven[i].itemType == 2 && (inven[i].isEquip == false))
+                                {
+                                    Console.WriteLine("장착중인 방어구가 있습니다. 장착해제 후 장착해주세요.");
+                                    Thread.Sleep(500); // 0.5초 지연
+                                }
                             }
-                            else if (inven[i].itemType == 2 && (inven[i].isEquip == false)) // 방어타입이고 장착해제면 방어력을 뺌
+                            else
                             {
-                                equipDefenceState -= inven[i].defence;
+                                if (inven[i].itemType == 2 && (inven[i].isEquip == false)) // 방어타입이고 장착해제면 방어력을 뺌
+                                {
+                                    equipDefenceState += inven[i].defence;
+                                    inven[i].isEquip = !inven[i].isEquip; // 장착 장착해제
+                                    isArmorCheck = true;
+                                }
                             }
                         }
                     }
@@ -216,15 +248,15 @@ namespace TextRPG
                         {
                             Console.WriteLine("- {0}\t| 공격력 +{1} \t| {2}", inven[i].name, inven[i].damage, inven[i].explanation);
                         }
-                        else if ((inven[i].itemType == 2) && (inven[i].isEquip == false) && (inven[i].isOwn == true)) // 방어구를 장착중이 아니면서 가지고 있고 관리가 활성화가 아닌경우
-                        {
-                            Console.WriteLine("- {0}\t| 방어력 +{1} \t| {2}", inven[i].name, inven[i].defence, inven[i].explanation);
-                        }
                         else if ((inven[i].itemType == 1) && (inven[i].isEquip == true) && (inven[i].isOwn == true)) // 무기를 장착중이면서 가지고 있고 관리가 활성화가 아닌경우
                         {
                             Console.WriteLine("- [E]{0}\t| 공격력 +{1} \t| {2}", inven[i].name, inven[i].damage, inven[i].explanation);
                         }
-                        else if ((inven[i].itemType == 1) && (inven[i].isEquip == true) && (inven[i].isOwn == true)) // 방어구를 장착중이면서 가지고 있고 관리가 활성화가 아닌경우
+                        if ((inven[i].itemType == 2) && (inven[i].isEquip == false) && (inven[i].isOwn == true)) // 방어구를 장착중이 아니면서 가지고 있고 관리가 활성화가 아닌경우
+                        {
+                            Console.WriteLine("- {0}\t| 방어력 +{1} \t| {2}", inven[i].name, inven[i].defence, inven[i].explanation);
+                        }
+                        else if ((inven[i].itemType == 2) && (inven[i].isEquip == true) && (inven[i].isOwn == true)) // 방어구를 장착중이면서 가지고 있고 관리가 활성화가 아닌경우
                         {
                             Console.WriteLine("- [E]{0}\t| 방어력 +{1} \t| {2}", inven[i].name, inven[i].defence, inven[i].explanation);
                         }
@@ -235,15 +267,15 @@ namespace TextRPG
                         {
                             Console.WriteLine("- {0} {1}\t| 공격력 +{2} \t| {3}", i + 1, inven[i].name, inven[i].damage, inven[i].explanation);
                         }
-                        else if ((inven[i].itemType == 2) && (inven[i].isEquip == false) && (inven[i].isOwn == true)) // 방어구를 장착중이 아니면서 가지고 있고 관리가 활성화인 경우
-                        {
-                            Console.WriteLine("- {0} {1}\t| 방어력 +{2} \t| {3}", i + 1, inven[i].name, inven[i].defence, inven[i].explanation);
-                        }
                         else if ((inven[i].itemType == 1) && (inven[i].isEquip == true) && (inven[i].isOwn == true)) // 무기를 장착중이면서 가지고 있고 관리가 활성화인 경우
                         {
                             Console.WriteLine("- [E]{0} {1}\t| 공격력 +{2} \t| {3}", i + 1, inven[i].name, inven[i].damage, inven[i].explanation);
                         }
-                        else if ((inven[i].itemType == 1) && (inven[i].isEquip == true) && (inven[i].isOwn == true)) // 방어구를 장착중이면서 가지고 있고 관리가 활성화인 경우
+                        if ((inven[i].itemType == 2) && (inven[i].isEquip == false) && (inven[i].isOwn == true)) // 방어구를 장착중이 아니면서 가지고 있고 관리가 활성화인 경우
+                        {
+                            Console.WriteLine("- {0} {1}\t| 방어력 +{2} \t| {3}", i + 1, inven[i].name, inven[i].defence, inven[i].explanation);
+                        }
+                        else if ((inven[i].itemType == 2) && (inven[i].isEquip == true) && (inven[i].isOwn == true)) // 방어구를 장착중이면서 가지고 있고 관리가 활성화인 경우
                         {
                             Console.WriteLine("- [E]{0} {1}\t| 방어력 +{2} \t| {3}", i + 1, inven[i].name, inven[i].defence, inven[i].explanation);
                         }
@@ -255,7 +287,7 @@ namespace TextRPG
                 }
                 else // 장비관리가 활성화 됐을때의 조건문
                 {
-                    InvenEquip(ref secondNum, ref isInvenPg, ref equipAttackstate, ref equipDefenceState);
+                    InvenEquip(ref secondNum, ref isInvenPg, ref equipAttackstate, ref equipDefenceState, ref isWeaponCheck, ref isArmorCheck);
                 }
             }
         } // 인벤토리
@@ -377,7 +409,15 @@ namespace TextRPG
                         {
                             equipDefenceState -= inven[i].defence;
                         }
+                        for (int j = 0; j < makeItem.Count; j++)
+                        {
+                            if (inven[i].itemCord == makeItem[j].itemCord)
+                            {
+                                makeItem[j].isOwn = false; 
+                            }
+                        }
                         inven.Remove(inven[i]);
+
                     }
                 }
 
@@ -527,19 +567,19 @@ namespace TextRPG
 
         static void ItemMake(List<Item> makeItem)
         {
-            makeItem.Add(new Item("낡은 검", 2, 0, 600, "쉽게 볼 수 있는 낡은 검 입니다.", 1, false, false));
-            makeItem.Add(new Item("청동 도끼", 5, 0, 1500, "어디선가 사용됐던거 같은 도끼입니다..", 1, false, false));
-            makeItem.Add(new Item("스파르타의 창", 7, 0, 3000, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 1, false, false));
-            makeItem.Add(new Item("전설의 검", 13, 0, 5000, "전설속에 내려오는 전설의 검입니다.", 1, false, false));
-            makeItem.Add(new Item("엑스칼리버", 50, 0, 9000, "전설속 아서왕이 사용했던 전설의 검입니다.", 1, false, false));
-            makeItem.Add(new Item("게 볼그", 50, 0, 9000, "켈트 신화의 영웅 쿠 훌린이 사용한 창입니다.", 1, false, false));
+            makeItem.Add(new Item("낡은 검", 2, 0, 600, "쉽게 볼 수 있는 낡은 검 입니다.", 1, false, false,1));
+            makeItem.Add(new Item("청동 도끼", 5, 0, 1500, "어디선가 사용됐던거 같은 도끼입니다..", 1, false, false,2));
+            makeItem.Add(new Item("스파르타의 창", 7, 0, 3000, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 1, false, false, 3));
+            makeItem.Add(new Item("전설의 검", 13, 0, 5000, "전설속에 내려오는 전설의 검입니다.", 1, false, false, 4));
+            makeItem.Add(new Item("엑스칼리버", 50, 0, 9000, "전설속 아서왕이 사용했던 전설의 검입니다.", 1, false, false, 5));
+            makeItem.Add(new Item("게 볼그", 50, 0, 9000, "켈트 신화의 영웅 쿠 훌린이 사용한 창입니다.", 1, false, false,6));
 
-            makeItem.Add(new Item("수련자 갑옷", 0, 5, 1000, "수련에 도움을 주는 갑옷입니다.", 2, false, false));
-            makeItem.Add(new Item("무쇠갑옷", 0, 9, 2000, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2, false, false));
-            makeItem.Add(new Item("스파르타의 갑옷", 0, 15, 3500, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 2, false, false));
-            makeItem.Add(new Item("전설의 갑옷", 0, 25, 5000, "전설속에 내려오는 전설의 갑옷입니다.", 2, false, false));
-            makeItem.Add(new Item("네메아의 사자 가죽", 0, 50, 9900, "헤라클래스가 네메아의 사자의 목을 졸라 죽여서 얻은 가죽입니다.", 2, false, false));
-            makeItem.Add(new Item("아킬레우스의 갑옷", 0, 50, 9900, "헤파이토스가 만든 아킬레우스의 갑옷입니다.", 2, false, false));
+            makeItem.Add(new Item("수련자 갑옷", 0, 5, 1000, "수련에 도움을 주는 갑옷입니다.", 2, false, false,7));
+            makeItem.Add(new Item("무쇠갑옷", 0, 9, 2000, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2, false, false,8));
+            makeItem.Add(new Item("스파르타의 갑옷", 0, 15, 3500, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 2, false, false,9));
+            makeItem.Add(new Item("전설의 갑옷", 0, 25, 5000, "전설속에 내려오는 전설의 갑옷입니다.", 2, false, false,10));
+            makeItem.Add(new Item("네메아의 사자 가죽", 0, 50, 9900, "헤라클래스가 네메아의 사자의 목을 졸라 죽여서 얻은 가죽입니다.", 2, false, false,11));
+            makeItem.Add(new Item("아킬레우스의 갑옷", 0, 50, 9900, "헤파이토스가 만든 아킬레우스의 갑옷입니다.", 2, false, false,12));
         }
 
         static void Main(string[] args)
@@ -564,6 +604,8 @@ namespace TextRPG
             bool isInvenPg = false; // 인벤토리 관리 활성화 여부
             bool isStorePurchase = false; // 상점구매 활성화 여부
             bool isStoreSell = false; // 상점 판매 활성화 여부
+            bool isWeaponCheck = false;
+            bool isArmorCheck = false;
 
 
             while (true)
@@ -580,7 +622,7 @@ namespace TextRPG
                 else if (isTrue && firstNum == 2)
                 {
                     //인벤토리
-                    InvenScene(inven, ref secondNum, ref equipAttackstate, ref equipDefenceState, ref isInvenPg, ref isStartPg);
+                    InvenScene(inven, ref secondNum, ref equipAttackstate, ref equipDefenceState, ref isInvenPg, ref isStartPg, ref isWeaponCheck, ref isArmorCheck);
                 }
                 else if (isTrue && firstNum == 3)
                 {
