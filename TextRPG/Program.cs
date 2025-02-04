@@ -255,7 +255,7 @@ namespace TextRPG
         // isInvenPg는 장비관리 화면을 활성화할건지 안할건지여부인데 메인에서 적용을해야 화면에 적용이되기때문에 ref사용
         // isStartPg 처음 씬을 끄고 키는데 이 값도 메인에서 바꿔야 하기때문에 사용 // 화면이 겹치는걸 방지함
 
-        static void StoreScene(List<Item> makeItem, List<Item> inven, ref Player player, ref int secondNum, ref bool isStorePurchase, ref bool isStartPg)
+        static void StoreScene(List<Item> makeItem, List<Item> inven, ref Player player, ref int secondNum, ref int equipAttackstate, ref int equipDefenceState, ref bool isStorePurchase, ref bool isStoreSell ,ref bool isStartPg)
         {
             Console.Clear();
             Console.WriteLine("[상점]");
@@ -267,7 +267,7 @@ namespace TextRPG
             Console.WriteLine("[아이템 목록]");
             for (int i = 0; i < makeItem.Count; i++)
             {
-                if (isStorePurchase == false) // 아이템구매가 비활성화 일 경우
+                if (isStorePurchase == false && isStoreSell == false) // 아이템구매가 비활성화 이면서 아이템 판매가 비활성화일경우
                 {
                     if (makeItem[i].itemType == 1) // 무기일 경우 
                     {
@@ -292,7 +292,7 @@ namespace TextRPG
                         }
                     }
                 }
-                else
+                else if (isStorePurchase == true && isStoreSell == false)
                 {
                     if (makeItem[i].itemType == 1) // 무기일 경우 
                     {
@@ -318,84 +318,136 @@ namespace TextRPG
                     }
                 }
             }
-                if (isStorePurchase == false)
+            for (int j = 0; j < inven.Count; j++)
+            {
+                if (isStorePurchase == false && isStoreSell == true)
                 {
-                    Console.WriteLine();
-                    Console.WriteLine("1. 아이템 구매");
-                    Console.WriteLine("0. 나가기");
-                    Console.WriteLine();
-                    Console.WriteLine("원하시는 행동을 입력해주세요");
-                    Console.Write(">>");
-                    bool isStore = int.TryParse(Console.ReadLine(), out secondNum);
-
-                    if (isStore && secondNum == 1) // 아이템 구매로 넘어갈시 초기화면 비활성화와 장비관리 활성화
+                    if ((inven[j].itemType == 1)  && (inven[j].isOwn == true)) // 무기를 가지고 있고 
                     {
-                        Console.Clear();
-                        isStorePurchase = true;
-                        isStartPg = false;
+                        Console.WriteLine("- {0} {1}\t| 공격력 +{2} \t| {3} \t| {4}", j + 1, inven[j].name, inven[j].damage, inven[j].explanation, inven[j].gold*0.85f);
                     }
-                    else if (!isStore || secondNum != 0) // 0이 아닐때 예외처리
+                    else if ((inven[j].itemType == 2)  && (inven[j].isOwn == true)) // 방어구를  가지고 있고 
                     {
-                        Console.WriteLine("입력이 잘못됐습니다.");
-                        Thread.Sleep(500); // 0.5초 지연
-                        Console.Clear();
-                        isStartPg = false;
-                    }
-                    else // 0 일때 출력
-                    {
-                        Console.Clear();
-                        isStartPg = true;
+                        Console.WriteLine("- {0} {1}\t| 방어력 +{2} \t| {3} \t| {4}", j + 1, inven[j].name, inven[j].defence, inven[j].explanation, inven[j].gold * 0.85f);
                     }
                 }
-                else // 아이템 구매가 활성화 됐을때의 조건문
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("0. 나가기");
-                    Console.WriteLine();
-                    Console.WriteLine("원하시는 행동을 입력해주세요");
-                    Console.Write(">>");
-                    bool isStore = int.TryParse(Console.ReadLine(), out secondNum);
-
-                    if (isStore && secondNum == 0) // 0입력시 아이템구매 비활성화
-                    {
-                        Console.Clear();
-                        isStorePurchase = false;
-                    }
-                    else if (isStore == false || (secondNum < 0) || (secondNum > makeItem.Count))
-                    {
-                        Console.WriteLine("입력이 잘못됐습니다!");
-                        Thread.Sleep(500); // 0.5초 지연
-                    }
-
-                    for (int j = 0; j < makeItem.Count; j++) // 아이템갯수 만큼 반복
-                    {
-                        if (j + 1 == secondNum) // j는 0부터 시작해서 +1 해줌으로써 입력값과 같게 해줌
-                        {
-                             if ((player.gold >= makeItem[j].gold) && (makeItem[j].isOwn == false))
-                             {
-                                 player.gold -= makeItem[j].gold;
-                                 makeItem[j].isOwn = true;
-                                 inven.Add(makeItem[j]);
-                                 Console.WriteLine("구매를 완료했습니다.");
-                                 Thread.Sleep(500); // 0.5초 지연
-                             }
-                             else if (player.gold < makeItem[j].gold)
-                             {
-                                 Console.WriteLine("Gold가 부족합니다...");
-                                 Thread.Sleep(500); // 0.5초 지연
-                             }
-                             else if (makeItem[j].isOwn == true)
-                             {
-                                Console.WriteLine("이미 구매한 아이템입니다.");
-                                Thread.Sleep(500); // 0.5초 지연
-                             }
-                        }
-
-                    }
-
             }
 
-            
+            if ((isStorePurchase == false) && (isStoreSell == false))
+            {
+                Console.WriteLine();
+                Console.WriteLine("1. 아이템 구매");
+                Console.WriteLine("2. 아이템 판매");
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요");
+                Console.Write(">>");
+                bool isStore = int.TryParse(Console.ReadLine(), out secondNum);
+
+                if (isStore && secondNum == 1) // 아이템 구매로 넘어갈시 초기화면 비활성화와 장비관리 활성화
+                {
+                    isStorePurchase = true;
+                    isStartPg = false;
+                }
+                else if (isStore && secondNum == 2) // 아이템 판매로 넘어갈시
+                {
+                    isStoreSell = true;
+                    isStartPg = false;
+                }
+                else if (!isStore || secondNum != 0) // 0이 아닐때 예외처리
+                {
+                    Console.WriteLine("입력이 잘못됐습니다.");
+                    Thread.Sleep(500); // 0.5초 지연
+                    isStartPg = false;
+                }
+                else // 0 일때 출력
+                {
+                    isStartPg = true;
+                }
+            }
+            else if (isStorePurchase) // 아이템 구매가 활성화 됐을때의 조건문
+            {
+                Console.WriteLine();
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요");
+                Console.Write(">>");
+                bool isStore = int.TryParse(Console.ReadLine(), out secondNum);
+
+                if (isStore && secondNum == 0) // 0입력시 아이템구매 비활성화
+                {
+                    isStorePurchase = false;
+                }
+                else if (isStore == false || (secondNum < 0) || (secondNum > makeItem.Count))
+                {
+                    Console.WriteLine("입력이 잘못됐습니다!");
+                    Thread.Sleep(500); // 0.5초 지연
+                }
+
+                for (int j = 0; j < makeItem.Count; j++) // 아이템갯수 만큼 반복
+                {
+                    if (j + 1 == secondNum) // j는 0부터 시작해서 +1 해줌으로써 입력값과 같게 해줌
+                    {
+                        if ((player.gold >= makeItem[j].gold) && (makeItem[j].isOwn == false))
+                        {
+                            player.gold -= makeItem[j].gold;
+                            makeItem[j].isOwn = true;
+                            inven.Add(makeItem[j]);
+                            Console.WriteLine("구매를 완료했습니다.");
+                            Thread.Sleep(500); // 0.5초 지연
+                        }
+                        else if (player.gold < makeItem[j].gold)
+                        {
+                            Console.WriteLine("Gold가 부족합니다...");
+                            Thread.Sleep(500); // 0.5초 지연
+                        }
+                        else if (makeItem[j].isOwn == true)
+                        {
+                            Console.WriteLine("이미 구매한 아이템입니다.");
+                            Thread.Sleep(500); // 0.5초 지연
+                        }
+                    }
+
+                }
+
+            }
+            else if (isStoreSell)
+            {
+                Console.WriteLine();
+                Console.WriteLine("0. 나가기");
+                Console.WriteLine();
+                Console.WriteLine("원하시는 행동을 입력해주세요");
+                Console.Write(">>");
+                bool isStore = int.TryParse(Console.ReadLine(), out secondNum);
+
+                if (isStore && secondNum == 0) // 0입력시 아이템구매 비활성화
+                {
+                    isStoreSell = false;
+                }
+                else if (isStore == false || (secondNum < 0) || (secondNum > inven.Count))
+                {
+                    Console.WriteLine("입력이 잘못됐습니다!");
+                    Thread.Sleep(500); // 0.5초 지연
+                }
+                for (int i = 0; i < inven.Count; i++)
+                {
+                    if (i + 1 == secondNum)
+                    {
+                        player.gold += ((inven[i].gold * 85) / 100);
+                        if ((inven[i].isEquip == true) && (inven[i].itemType == 1))
+                        {
+                            equipAttackstate -= inven[i].damage;
+                        }
+                        else if ((inven[i].isEquip == true) && (inven[i].itemType == 2))
+                        {
+                            equipDefenceState -= inven[i].defence;
+                        }
+                        inven.Remove(inven[i]);
+                    }
+                }
+            }
+
+
         }
         // makeItem이라는 아이템들이 모여있는 리스트 가져옴
         // inven이라는 인벤토리 아이템리스트 불러오고 구매시 makeItem의 아이템을 inven에 Add
@@ -408,7 +460,7 @@ namespace TextRPG
         {
             Console.Clear();
             Console.WriteLine("[휴식하기]");
-            Console.WriteLine("500 G 를 내면 체력을 회복할 수 있습니다. (보유 골드 : {0} G)",player.gold);
+            Console.WriteLine("500 G 를 내면 체력을 회복할 수 있습니다. (보유 골드 : {0} G)", player.gold);
             Console.WriteLine();
             Console.WriteLine("1. 휴식하기");
             Console.WriteLine("0. 나가기");
@@ -479,14 +531,15 @@ namespace TextRPG
             int secondNum = 1; // 화면 전환 후 선택을 위한 변수
 
             int equipAttackstate = 0; // 장착 공격력 변수
-            int equipDefencestate = 0; // 장착 방어력 변수
-            
+            int equipDefenceState = 0; // 장착 방어력 변수
+
             bool isTrue = false;
             bool isStartPg = true; //시작 화면 활성화 여부
             bool isInvenPg = false; // 인벤토리 관리 활성화 여부
             bool isStorePurchase = false; // 상점구매 활성화 여부
+            bool isStoreSell = false; // 상점 판매 활성화 여부
 
-            
+
             while (true)
             {
                 if (isStartPg)
@@ -496,17 +549,17 @@ namespace TextRPG
                 if (isTrue && firstNum == 1)
                 {
                     // 상태
-                    StateScene(player, playerName, ref equipAttackstate, ref equipDefencestate, ref secondNum, ref isStartPg);
+                    StateScene(player, playerName, ref equipAttackstate, ref equipDefenceState, ref secondNum, ref isStartPg);
                 }
                 else if (isTrue && firstNum == 2)
                 {
                     //인벤토리
-                    InvenScene(inven, ref secondNum, ref equipAttackstate, ref equipDefencestate, ref isInvenPg, ref isStartPg);
+                    InvenScene(inven, ref secondNum, ref equipAttackstate, ref equipDefenceState, ref isInvenPg, ref isStartPg);
                 }
                 else if (isTrue && firstNum == 3)
                 {
                     // 상점
-                    StoreScene(makeItem, inven, ref player, ref secondNum, ref isStorePurchase, ref isStartPg);
+                    StoreScene(makeItem, inven, ref player, ref secondNum, ref equipAttackstate, ref equipDefenceState, ref isStorePurchase, ref isStoreSell, ref isStartPg);
                 }
                 else if (isTrue && firstNum == 4)
                 {
