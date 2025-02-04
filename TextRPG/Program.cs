@@ -447,15 +447,27 @@ namespace TextRPG
 
         }
 
+        static void ItemMake(List<Item> makeItem)
+        {
+            makeItem.Add(new Item("낡은 검", 2, 0, 600, "쉽게 볼 수 있는 낡은 검 입니다.", 1, false, false));
+            makeItem.Add(new Item("청동 도끼", 5, 0, 1500, "어디선가 사용됐던거 같은 도끼입니다..", 1, false, false));
+            makeItem.Add(new Item("스파르타의 창", 7, 0, 3000, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 1, false, false));
+            makeItem.Add(new Item("전설의 검", 13, 0, 5000, "전설속에 내려오는 전설의 검입니다.", 1, false, false));
+            makeItem.Add(new Item("엑스칼리버", 50, 0, 9000, "전설속 아서왕이 사용했던 전설의 검입니다.", 1, false, false));
+            makeItem.Add(new Item("게 볼그", 50, 0, 9000, "켈트 신화의 영웅 쿠 훌린이 사용한 창입니다.", 1, false, false));
+
+            makeItem.Add(new Item("수련자 갑옷", 0, 5, 1000, "수련에 도움을 주는 갑옷입니다.", 2, false, false));
+            makeItem.Add(new Item("무쇠갑옷", 0, 9, 2000, "무쇠로 만들어져 튼튼한 갑옷입니다.", 2, false, false));
+            makeItem.Add(new Item("스파르타의 갑옷", 0, 15, 3500, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 2, false, false));
+            makeItem.Add(new Item("전설의 갑옷", 0, 25, 5000, "전설속에 내려오는 전설의 갑옷입니다.", 2, false, false));
+            makeItem.Add(new Item("네메아의 사자 가죽", 0, 50, 9900, "헤라클래스가 네메아의 사자의 목을 졸라 죽여서 얻은 가죽입니다.", 2, false, false));
+            makeItem.Add(new Item("아킬레우스의 갑옷", 0, 50, 9900, "헤파이토스가 만든 아킬레우스의 갑옷입니다.", 2, false, false));
+        }
+
         static void Main(string[] args)
         {
             List<Item> makeItem = new List<Item>(); // 아이템 생성
-            makeItem.Add(new Item("낡은 검", 2, 0, 600, "쉽게 볼 수 있는 낡은 검 입니다.",1, false, false));
-            makeItem.Add(new Item("청동 도끼", 5, 0, 1500, "어디선가 사용됐던거 같은 도끼입니다..", 1, false, false));
-            makeItem.Add(new Item("스파르타의 창", 7, 0, 3000, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 1, false, false));
-            makeItem.Add(new Item("수련자 갑옷", 0, 5, 1000, "수련에 도움을 주는 갑옷입니다.", 2, false, false));
-            makeItem.Add(new Item("무쇠갑옷", 0, 9, 2000, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 2, false, false));
-            makeItem.Add(new Item("스파르타의 갑옷", 0, 15, 3500, "수련에 도움을 주는 갑옷입니다.", 2, false, false));
+            ItemMake(makeItem);
 
             List<Item> inven = new List<Item>(); // 인벤토리 생성       
 
